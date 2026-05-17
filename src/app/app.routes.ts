@@ -18,7 +18,8 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/not-found',
+    loadComponent: () =>
+      import('./portal/app-home.component').then((m) => m.HomeComponent),
     pathMatch: 'full',
   },
   {
