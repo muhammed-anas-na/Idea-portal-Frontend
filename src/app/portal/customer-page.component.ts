@@ -387,6 +387,7 @@ export class CustomerPageComponent implements OnInit, OnDestroy {
         this.loading.set(false);
         this.pageLoadedAt = Date.now();
         this.tracker.track('page_view', { token: this.token, customerName: d.name });
+        this.identifyInClarity(d);
       },
       error: () => {
         this.data.set(null);
@@ -413,7 +414,17 @@ export class CustomerPageComponent implements OnInit, OnDestroy {
       this.tracker.track('outbound_click', { href });
     }
   }
-
+private identifyInClarity(d: PortalData): void {
+  const w = window as any;
+  if (typeof w.clarity === 'function') {
+    w.clarity('identify',
+      this.token,   // unique user ID
+      this.token,                    // session ID (optional)
+      `/c/${this.token}`,            // page ID (optional)
+      d.name                         // friendly name shown in Clarity
+    );
+  }
+}
   protected openDetail(it: PortalInteraction): void {
     this.tracker.track('navigation', { to: 'idea_detail', interactionId: it.id }, it.id);
     void this.router.navigate(['/c', this.token, 'idea', it.id]);

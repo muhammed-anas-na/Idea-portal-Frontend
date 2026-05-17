@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import Clarity from '@microsoft/clarity';
 
+
 @Injectable({ providedIn: 'root' })
 export class ClarityService {
   init(): void {
