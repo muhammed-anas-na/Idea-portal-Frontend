@@ -1,0 +1,35 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --fb-navy:        #1B2A4E;
+  --fb-navy-light:  #263959;
+  --fb-blue:        #286EFA;
+  --fb-orange:      #F26B21;
+  --fb-cream:       #F8F6F1;
+  --fb-border:      #E2E6EF;
+  --fb-text:        #1B2A4E;
+  --fb-text-muted:  #6B7A99;
+  --fb-white:       #FFFFFF;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  color: var(--fb-text);
+  background: var(--fb-cream);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--fb-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
