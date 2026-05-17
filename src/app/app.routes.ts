@@ -23,12 +23,8 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'not-found',
+    path: '**',
     loadComponent: () =>
       import('./portal/customer-page.component').then((m) => m.CustomerPageComponent),
-  },
-  {
-    path: '**',
-    redirectTo: '/not-found',
   },
 ];
