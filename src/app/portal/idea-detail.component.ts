@@ -70,6 +70,7 @@ const KIND_ICON: Record<string, string> = {
                 <span class="kind-pill" data-kind="post">
                   💡 Idea
                 </span>
+          
                 <span *ngIf="d.interaction.occurredOn" class="idea-date">
                   {{ d.interaction.occurredOn | date:'MMM d, y' }}
                 </span>
@@ -85,66 +86,7 @@ const KIND_ICON: Record<string, string> = {
           </section>
 
           <!-- Two-column: answer (75%) + community (25%) -->
-          <div class="two-col">
-
-            <!-- Left: Feebak's Solution -->
-            <section class="answer-section" [style.--accent]="accent(d)">
-              <div class="answer-header">
-                <div class="answer-badge">
-                  <span class="answer-dot" [style.background]="accent(d)"></span>
-                  Feebak's Solution
-                </div>
-                <a *ngIf="d.interaction.answer.product"
-                  class="product-badge"
-                  [href]="d.interaction.answer.product.url"
-                  target="_blank" rel="noopener"
-                  (click)="trackOutbound(d.interaction.answer.product!.url)">
-                  {{ d.interaction.answer.product.name }} ↗
-                </a>
-              </div>
-              <div class="answer-body rich-text"
-                [innerHTML]="d.interaction.answer.contentHtml"></div>
-
-              <div class="answer-cta" *ngIf="d.page?.calendlyUrl">
-                <p>Want to see this in action?</p>
-                <a class="cta-btn" [href]="d.page!.calendlyUrl!" target="_blank" rel="noopener"
-                  [style.background]="accent(d)" (click)="trackDemoClick(d)">
-                  Book a Demo
-                </a>
-              </div>
-            </section>
-
-            <!-- Right: Community activity -->
-            <aside class="community-aside" *ngIf="d.communityActivity">
-              <div class="community-header">
-                <h2 class="section-label">Community</h2>
-                <div class="community-stats">
-                  <span class="comm-stat comm-stat-vote" *ngIf="d.communityActivity!.voteCount">
-                    👍 {{ d.communityActivity!.voteCount }}
-                  </span>
-                  <span class="comm-stat comm-stat-comment" *ngIf="d.communityActivity!.totalComments">
-                    💬 {{ d.communityActivity!.totalComments }}
-                  </span>
-                </div>
-              </div>
-              <div class="community-list" *ngIf="d.communityActivity!.comments.length > 0">
-                <div class="community-item" *ngFor="let c of d.communityActivity!.comments">
-                  <div class="community-item-meta">
-                    <span class="kind-pill" [attr.data-kind]="c.kind">
-                      {{ kindIcon(c.kind) }} {{ kindLabel(c.kind) }}
-                    </span>
-                    <span *ngIf="c.occurredOn" class="related-date">{{ c.occurredOn | date:'MMM d, y' }}</span>
-                  </div>
-                  <p class="related-body" *ngIf="c.body">{{ c.body }}</p>
-                  <p class="related-body no-body" *ngIf="!c.body">{{ c.title }}</p>
-                </div>
-              </div>
-              <p class="no-comments" *ngIf="d.communityActivity!.comments.length === 0 && !d.communityActivity!.voteCount">
-                No community activity yet.
-              </p>
-            </aside>
-
-          </div>
+        
 
         </div>
       </main>
@@ -177,24 +119,6 @@ const KIND_ICON: Record<string, string> = {
           </div>
         </div>
       </section>
-
-      <!-- Footer -->
-      <footer class="outro-section">
-        <div class="outro-inner">
-          <div *ngIf="d.page?.outroHtml" class="outro-body rich-text"
-            [innerHTML]="d.page!.outroHtml"></div>
-          <div class="cta-block" *ngIf="d.page?.calendlyUrl">
-            <h3>Ready to see Feebak in action?</h3>
-            <a class="cta-btn-large" [href]="d.page!.calendlyUrl!" target="_blank" rel="noopener"
-              [style.background]="accent(d)" (click)="trackDemoClick(d)">
-              Request a Demo
-            </a>
-          </div>
-          <div class="footer-brand">
-            <span>Powered by</span><strong>Feebak</strong>
-          </div>
-        </div>
-      </footer>
     </ng-container>
   `,
   styles: [`
@@ -423,7 +347,7 @@ const KIND_ICON: Record<string, string> = {
     .oi-cta { font-size: 12px; font-weight: 700; margin-top: auto; }
 
     /* Footer */
-    .outro-section { background: var(--fb-navy); padding: 60px 24px; }
+    .outro-section { background: var(--fb-navy); padding: 60px 24px;}
     .outro-inner { max-width: 760px; margin: 0 auto; text-align: center; }
     .outro-body { color: rgba(255,255,255,0.8); font-size: 15px; margin-bottom: 36px; }
     .cta-block h3 {

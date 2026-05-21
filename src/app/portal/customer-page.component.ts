@@ -18,7 +18,104 @@ const KIND_ICON: Record<string, string> = {
   post: '💡', comment: '💬', reply: '↩️', vote: '👍',
 };
 
-type ListingTab = 'ideas' | 'cases';
+type ListingTab = 'ideas' | 'what' | 'usecases';
+
+interface FeebakFeature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface FeebakUseCase {
+  tag: string;
+  title: string;
+  description: string;
+  outcome: string;
+}
+
+const WHAT_FEEBAK_DOES: FeebakFeature[] = [
+  {
+    icon: '🎯',
+    title: 'Centralize Customer Feedback',
+    description:
+      'Collect ideas, comments, and votes from every channel in one organized place — no more scattered feedback across emails, Slack, and support tickets.',
+  },
+  {
+    icon: '🗳️',
+    title: 'Public & Private Idea Boards',
+    description:
+      'Let customers post and vote on ideas publicly, or run private boards for select accounts. You decide what stays internal and what goes public.',
+  },
+  {
+    icon: '🔔',
+    title: 'Keep Customers in the Loop',
+    description:
+      'Automatically notify customers when their requested feature is planned, in progress, or shipped — closing the feedback loop without manual work.',
+  },
+  {
+    icon: '📊',
+    title: 'Prioritize What Matters',
+    description:
+      'See which ideas have the most demand, tied to the customers who care most. Make roadmap decisions backed by real signal.',
+  },
+  {
+    icon: '🧩',
+    title: 'Custom Branded Portals',
+    description:
+      'Give every customer a personalized landing page showing exactly how their feedback maps to your roadmap and shipped features.',
+  },
+  {
+    icon: '🔗',
+    title: 'Integrate With Your Stack',
+    description:
+      'Sync with Jira, Linear, Slack, and Intercom so feedback flows naturally into your existing workflows.',
+  },
+];
+
+const FEEBAK_USE_CASES: FeebakUseCase[] = [
+  {
+    tag: 'Product Teams',
+    title: 'Build a Roadmap Customers Actually Want',
+    description:
+      'Stop guessing which features to build next. Capture ideas directly from users, see vote counts and demand signals, and ship the things that move the needle.',
+    outcome: 'Cut wasted dev cycles by 40%',
+  },
+  {
+    tag: 'Customer Success',
+    title: 'Close the Loop on Every Request',
+    description:
+      'When a feature ships, every customer who asked for it gets notified automatically. Turn feature requests into renewal and expansion moments.',
+    outcome: 'Higher NRR through proactive comms',
+  },
+  {
+    tag: 'Sales & Pre-Sales',
+    title: 'Win Deals With Transparent Roadmaps',
+    description:
+      'Share a personalized portal with prospects showing exactly how your product addresses their feedback. Build trust before the contract is signed.',
+    outcome: 'Shorter sales cycles, higher close rates',
+  },
+  {
+    tag: 'Founders & PMs',
+    title: 'Replace Spreadsheets and Slack Threads',
+    description:
+      'Consolidate every feedback source — sales calls, support chats, customer interviews — into one searchable, sortable, prioritizable system.',
+    outcome: 'Single source of truth for feedback',
+  },
+  {
+    tag: 'Marketing',
+    title: 'Turn Shipped Features Into Stories',
+    description:
+      'Use Feebak as proof of how responsive your product is. Every closed idea becomes a customer-driven launch announcement.',
+    outcome: 'Better launches, stronger positioning',
+  },
+  {
+    tag: 'B2B SaaS',
+    title: 'Make Every Customer Feel Heard',
+    description:
+      'Give enterprise customers a private portal where their team can submit ideas, see status, and engage with your roadmap directly.',
+    outcome: 'Stronger account relationships',
+  },
+];
 
 @Component({
   selector: 'fb-customer-page',
@@ -76,14 +173,16 @@ type ListingTab = 'ideas' | 'cases';
         <div class="feed-inner">
 
           <!-- Tab row -->
-          <div class="tab-row" *ngIf="d.useCases.length > 0">
-            <button class="tab-btn" [class.active]="activeTab() === 'ideas'" (click)="activeTab.set('ideas')">
+          <div class="tab-row">
+            <button class="tab-btn" [class.active]="activeTab() === 'ideas'" (click)="setTab('ideas')">
               Ideas
               <span class="tab-count">{{ d.interactions.length }}</span>
             </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'cases'" (click)="activeTab.set('cases')">
+            <button class="tab-btn" [class.active]="activeTab() === 'what'" (click)="setTab('what')">
+              What Feebak Does
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'usecases'" (click)="setTab('usecases')">
               Use Cases
-              <span class="tab-count">{{ d.useCases.length }}</span>
             </button>
           </div>
 
@@ -108,7 +207,7 @@ type ListingTab = 'ideas' | 'cases';
                     <span class="kind-pill" [attr.data-kind]="it.kind">
                       {{ kindIcon(it.kind) }} {{ kindLabel(it.kind) }}
                     </span>
-                    <span *ngIf="it.occurredOn" class="card-date">
+                    <span *ngIf="it.occurredOn && it.kind !== 'vote'" class="card-date">
                       {{ it.occurredOn | date:'MMM d, y' }}
                     </span>
                   </div>
@@ -131,35 +230,45 @@ type ListingTab = 'ideas' | 'cases';
             </div>
           </div>
 
-          <!-- USE CASES tab -->
-          <div *ngIf="activeTab() === 'cases'">
+          <!-- WHAT FEEBAK DOES tab -->
+          <div *ngIf="activeTab() === 'what'">
             <div class="feed-heading">
-              <h2>{{ d.useCases.length }} use case{{ d.useCases.length !== 1 ? 's' : '' }}</h2>
-              <p class="feed-sub">See how Feebak solves real-world challenges.</p>
+              <h2>What Feebak does</h2>
+              <p class="feed-sub">A simple system for turning customer feedback into product progress.</p>
             </div>
 
-            <div class="cards-grid">
-              <article
-                *ngFor="let uc of d.useCases"
-                class="idea-card"
-                (click)="openCase(uc)"
-                (keydown.enter)="openCase(uc)"
-                tabindex="0"
-                role="button"
-              >
-                <div class="card-body">
-                  <div class="card-meta">
-                    <span class="kind-pill kind-pill-case">📋 Use Case</span>
-                    <span *ngIf="uc.product" class="card-date">{{ uc.product.name }}</span>
+            <div class="feature-grid">
+              <div class="feature-card" *ngFor="let f of features">
+                <div class="feature-icon">{{ f.icon }}</div>
+                <h3 class="feature-title">{{ f.title }}</h3>
+                <p class="feature-desc">{{ f.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- USE CASES tab -->
+          <div *ngIf="activeTab() === 'usecases'">
+            <div class="feed-heading">
+              <h2>Feebak use cases</h2>
+              <p class="feed-sub">How teams across product, success, and sales put Feebak to work.</p>
+            </div>
+
+            <div class="usecase-list">
+              <div class="usecase-row" *ngFor="let uc of useCases">
+                <div class="usecase-left">
+                  <span class="usecase-tag" [style.color]="accent(d)" [style.borderColor]="accent(d)">
+                    {{ uc.tag }}
+                  </span>
+                </div>
+                <div class="usecase-main">
+                  <h3 class="usecase-title">{{ uc.title }}</h3>
+                  <p class="usecase-desc">{{ uc.description }}</p>
+                  <div class="usecase-outcome">
+                    <span class="outcome-dot" [style.background]="accent(d)"></span>
+                    {{ uc.outcome }}
                   </div>
-                  <h3 class="card-title">{{ uc.title }}</h3>
-                  <p *ngIf="uc.summary" class="card-excerpt">{{ uc.summary }}</p>
                 </div>
-                <div class="card-cta" [style.background]="accent(d)">
-                  <span>Read use case</span>
-                  <span class="cta-arrow">→</span>
-                </div>
-              </article>
+              </div>
             </div>
           </div>
 
@@ -247,6 +356,7 @@ type ListingTab = 'ideas' | 'cases';
     .tab-row {
       display: flex; gap: 4px; border-bottom: 2px solid var(--fb-border);
       margin-bottom: 28px;
+      overflow-x: auto;
     }
     .tab-btn {
       background: transparent; border: none; border-bottom: 2px solid transparent;
@@ -255,6 +365,7 @@ type ListingTab = 'ideas' | 'cases';
       cursor: pointer; font-family: inherit;
       display: flex; align-items: center; gap: 7px;
       transition: color 0.15s;
+      white-space: nowrap;
     }
     .tab-btn:hover { color: var(--fb-navy); }
     .tab-btn.active { color: var(--fb-navy); border-bottom-color: var(--fb-navy); }
@@ -271,7 +382,7 @@ type ListingTab = 'ideas' | 'cases';
     }
     .feed-sub { color: var(--fb-text-muted); font-size: 14px; margin: 0; }
 
-    /* Cards grid */
+    /* Cards grid (ideas) */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -329,6 +440,104 @@ type ListingTab = 'ideas' | 'cases';
     .idea-card:hover .cta-arrow { transform: translateX(4px); }
     .empty-feed { text-align: center; padding: 60px 0; color: var(--fb-text-muted); font-size: 15px; }
 
+    /* What Feebak Does — feature grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: #fff;
+      border: 1px solid var(--fb-border);
+      border-radius: 12px;
+      padding: 22px 22px 20px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .feature-card:hover {
+      border-color: #d4d4d4;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .feature-icon {
+      font-size: 26px;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+    .feature-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--fb-navy);
+      margin: 0 0 8px;
+      line-height: 1.35;
+    }
+    .feature-desc {
+      font-size: 13.5px;
+      color: var(--fb-text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Use Cases — minimal list */
+    .usecase-list {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--fb-border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .usecase-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 24px;
+      padding: 24px 26px;
+      border-bottom: 1px solid var(--fb-border);
+      transition: background 0.12s;
+    }
+    .usecase-row:last-child { border-bottom: none; }
+    .usecase-row:hover { background: #fafaf7; }
+    .usecase-left {
+      display: flex;
+      align-items: flex-start;
+      padding-top: 2px;
+    }
+    .usecase-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid;
+      border-radius: 999px;
+    }
+    .usecase-main { min-width: 0; }
+    .usecase-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--fb-navy);
+      margin: 0 0 6px;
+      line-height: 1.4;
+    }
+    .usecase-desc {
+      font-size: 13.5px;
+      color: var(--fb-text-muted);
+      line-height: 1.6;
+      margin: 0 0 12px;
+    }
+    .usecase-outcome {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--fb-navy);
+    }
+    .outcome-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
     /* Footer */
     .outro-section { background: var(--fb-navy); padding: 60px 24px; }
     .outro-inner { max-width: 760px; margin: 0 auto; text-align: center; }
@@ -349,11 +558,21 @@ type ListingTab = 'ideas' | 'cases';
     }
     .footer-brand strong { color: rgba(255,255,255,0.55); }
 
+    @media (max-width: 700px) {
+      .usecase-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 20px;
+      }
+    }
+
     @media (max-width: 600px) {
       .hero { padding: 32px 18px 40px; }
       .hero-title { font-size: 26px; }
       .feed-wrapper { padding: 28px 16px 48px; }
       .cards-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 10px 14px; font-size: 13px; }
     }
   `],
 })
@@ -366,6 +585,9 @@ export class CustomerPageComponent implements OnInit, OnDestroy {
   protected readonly data = signal<PortalData | null>(null);
   protected readonly loading = signal(true);
   protected readonly activeTab = signal<ListingTab>('ideas');
+
+  protected readonly features = WHAT_FEEBAK_DOES;
+  protected readonly useCases = FEEBAK_USE_CASES;
 
   private token = '';
   private pageLoadedAt = 0;
@@ -414,17 +636,24 @@ export class CustomerPageComponent implements OnInit, OnDestroy {
       this.tracker.track('outbound_click', { href });
     }
   }
-private identifyInClarity(d: PortalData): void {
-  const w = window as any;
-  if (typeof w.clarity === 'function') {
-    w.clarity('identify',
-      this.token,   // unique user ID
-      this.token,                    // session ID (optional)
-      `/c/${this.token}`,            // page ID (optional)
-      d.name                         // friendly name shown in Clarity
-    );
+
+  private identifyInClarity(d: PortalData): void {
+    const w = window as any;
+    if (typeof w.clarity === 'function') {
+      w.clarity('identify',
+        this.token,                    // unique user ID
+        this.token,                    // session ID (optional)
+        `/c/${this.token}`,            // page ID (optional)
+        d.name                         // friendly name shown in Clarity
+      );
+    }
   }
-}
+
+  protected setTab(tab: ListingTab): void {
+    this.activeTab.set(tab);
+    this.tracker.track('navigation', { to: 'tab', tab });
+  }
+
   protected openDetail(it: PortalInteraction): void {
     this.tracker.track('navigation', { to: 'idea_detail', interactionId: it.id }, it.id);
     void this.router.navigate(['/c', this.token, 'idea', it.id]);
